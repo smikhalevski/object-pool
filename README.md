@@ -1,6 +1,8 @@
 # yaop
 
-Yet another object pool.
+Yet another object pool. There are many like it, but this one is mine.
+
+Heavily inspired by https://github.com/getify/deePool and is slightly faster.
 
 ```shell
 npm install yaop
