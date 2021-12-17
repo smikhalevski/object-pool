@@ -2,7 +2,8 @@
 
 [The tiny](https://bundlephobia.com/package/@smikhalevski/object-pool) and efficient object pool.
 
-Inspired by https://github.com/getify/deePool and is slightly faster.
+This implementation was inspired by [deePool](https://github.com/getify/deePool) and is slightly faster than the
+original.
 
 ```shell
 npm install @smikhalevski/object-pool
