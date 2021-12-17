@@ -1,7 +1,7 @@
 {
-  "name": "yaop",
+  "name": "@smikhalevski/object-pool",
   "version": "1.0.0",
-  "description": "Yet another object pool.",
+  "description": "The tiny and efficient object pool.",
   "main": "./lib/index-cjs.js",
   "module": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -12,14 +12,14 @@
   "scripts": {
     "build": "tsc && npm run rollup && npm run terser",
     "rollup": "rollup --input ./lib/index.js --file ./lib/index-cjs.js --format cjs --plugin @rollup/plugin-node-resolve",
-    "terser": "terser --compress --mangle toplevel --output ./lib/index-cjs.js -- ./lib/index-cjs.js",
+    "terser": "for file in $(find ./lib -name '*.js'); do terser --compress --mangle --mangle-props regex=/^_/ --output $file -- $file; done || exit 1",
     "clean": "rm -rf ./lib",
     "test": "jest --detectOpenHandles",
     "perf": "[ -d ./lib ] || npm run build && node --expose-gc --max-old-space-size=4096 ./src/test/perf.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/smikhalevski/yaop.git"
+    "url": "git+https://github.com/smikhalevski/object-pool.git"
   },
   "keywords": [
     "object",
@@ -28,9 +28,9 @@
   "author": "Savva Mikhalevski <smikhalevski@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/smikhalevski/yaop/issues"
+    "url": "https://github.com/smikhalevski/object-pool/issues"
   },
-  "homepage": "https://github.com/smikhalevski/yaop#readme",
+  "homepage": "https://github.com/smikhalevski/object-pool#readme",
   "jest": {
     "preset": "ts-jest",
     "globals": {
