@@ -1,10 +1,10 @@
-import {createObjectPool} from '../main/createObjectPool';
+import {ObjectPool} from '../main';
 
-describe('createObjectPool', () => {
+describe('ObjectPool', () => {
 
   test('returns new value', () => {
     let i = 0;
-    const pool = createObjectPool(() => i++);
+    const pool = new ObjectPool(() => i++);
 
     expect(pool.take()).toBe(0);
     expect(pool.take()).toBe(1);
@@ -13,7 +13,7 @@ describe('createObjectPool', () => {
 
   test('frees a single value', () => {
     let i = 0;
-    const pool = createObjectPool(() => i++);
+    const pool = new ObjectPool(() => i++);
 
     expect(pool.take()).toBe(0);
     pool.release(0);
@@ -22,7 +22,7 @@ describe('createObjectPool', () => {
 
   test('frees existing value', () => {
     let i = 0;
-    const pool = createObjectPool(() => i++);
+    const pool = new ObjectPool(() => i++);
 
     expect(pool.take()).toBe(0);
     expect(pool.take()).toBe(1);
@@ -35,7 +35,7 @@ describe('createObjectPool', () => {
 
   test('frees multiple existing values', () => {
     let i = 0;
-    const pool = createObjectPool(() => i++);
+    const pool = new ObjectPool(() => i++);
 
     expect(pool.take()).toBe(0);
     expect(pool.take()).toBe(1);

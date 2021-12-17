@@ -2,7 +2,7 @@
 
 [The tiny](https://bundlephobia.com/package/@smikhalevski/object-pool) and efficient object pool.
 
-Heavily inspired by https://github.com/getify/deePool and is slightly faster.
+Inspired by https://github.com/getify/deePool and is slightly faster.
 
 ```shell
 npm install @smikhalevski/object-pool
@@ -11,10 +11,12 @@ npm install @smikhalevski/object-pool
 # Usage
 
 ```ts
-import {createObjectPool} from '@smikhalevski/object-pool';
+import {ObjectPool} from '@smikhalevski/object-pool';
 
-const pool = createObjectPool(() => {
+const pool = new ObjectPool(() => {
   // Create and return a heavy object.
+}, (value) => {
+  // Reset the released object. 
 });
 
 // Prepare 100 heavy objects.

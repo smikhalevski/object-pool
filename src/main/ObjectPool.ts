@@ -1,3 +1,8 @@
+/**
+ * The array-backed object pool implementation.
+ *
+ * @see https://en.wikipedia.org/wiki/Object_pool_pattern Object pool pattern
+ */
 export class ObjectPool<T> {
 
   private _cache: Array<T> = [];
@@ -5,6 +10,12 @@ export class ObjectPool<T> {
   private _factory;
   private _reset;
 
+  /**
+   * Creates the new {@link ObjectPool} instance.
+   *
+   * @param factory The factory that produces new values.
+   * @param reset The callback that is invoked when value is returned to the pool via {@link release}.
+   */
   public constructor(factory: () => T, reset?: (value: T) => void) {
     this._factory = factory;
     this._reset = reset;
@@ -18,7 +29,7 @@ export class ObjectPool<T> {
     const {_cache, _cursor} = this;
 
     if (_cursor === _cache.length) {
-      this._allocate(_cache.length || 5);
+      this.allocate(_cache.length || 5);
     }
     const value = _cache[_cursor];
     _cache[this._cursor++] = null as unknown as T;
@@ -26,29 +37,25 @@ export class ObjectPool<T> {
   }
 
   /**
-   * Returns a value to the pool so it can be retrieved using {@link IObjectPool.take}. There's no check that value was
+   * Returns a value to the pool so it can be retrieved using {@link ObjectPool.take}. There's no check that value was
    * already returned to the pool and no check that value was in the pool previously. So ensure you don't release the
    * same value twice or release a value that doesn't belong to the pool.
    */
   public release(value: T): void {
-    const {_cache} = this;
+    const {_cache, _reset} = this;
 
+    if (_reset) {
+      _reset(value);
+    }
     _cache[this._cursor === 0 ? _cache.length : --this._cursor] = value;
   }
 
   /**
-   * Populates pool with new values produced by factory.
+   * Populates pool with new values produced by the factory.
    *
-   * @param count The number of value to produce.
+   * @param count The integer number of values to produce.
    */
   public allocate(count: number): void {
-    count |= 0;
-    if (count > 0) {
-      this._allocate(count);
-    }
-  }
-
-  private _allocate(count: number): void {
     const {_cache, _factory} = this;
 
     const prevLength = _cache.length;

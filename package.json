@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc && npm run rollup && npm run terser",
     "rollup": "rollup --input ./lib/index.js --file ./lib/index-cjs.js --format cjs --plugin @rollup/plugin-node-resolve",
-    "terser": "terser --compress --mangle toplevel --output ./lib/index-cjs.js -- ./lib/index-cjs.js",
+    "terser": "for file in $(find ./lib -name '*.js'); do terser --compress --mangle --mangle-props regex=/^_/ --output $file -- $file; done || exit 1",
     "clean": "rm -rf ./lib",
     "test": "jest --detectOpenHandles",
     "perf": "[ -d ./lib ] || npm run build && node --expose-gc --max-old-space-size=4096 ./src/test/perf.js"
