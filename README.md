@@ -1,17 +1,17 @@
-# yaop
+# object-pool [![build](https://github.com/smikhalevski/object-pool/actions/workflows/master.yml/badge.svg?branch=master&event=push)](https://github.com/smikhalevski/object-pool/actions/workflows/master.yml)
 
-Yet another object pool. There are many like it, but this one is mine.
+[The tiny](https://bundlephobia.com/package/@smikhalevski/object-pool) and efficient object pool.
 
 Heavily inspired by https://github.com/getify/deePool and is slightly faster.
 
 ```shell
-npm install yaop
+npm install @smikhalevski/object-pool
 ```
 
 # Usage
 
 ```ts
-import {createObjectPool} from 'yaop';
+import {createObjectPool} from '@smikhalevski/object-pool';
 
 const pool = createObjectPool(() => {
   // Create and return a heavy object.

@@ -1,53 +1,104 @@
 const {test} = require('@smikhalevski/perf-test');
 const chalk = require('chalk');
 const deepool = require('deepool');
-const {createObjectPool} = require('../../lib/index-cjs');
+const objectPool = require('../../lib/index-cjs');
 
-console.log(chalk.bold('Huge pool'));
+const objectFactory = () => Object.create(null);
+
+console.log(chalk.bold('New pool take/release'));
 {
-  const yaopPool = createObjectPool(() => 123);
-  const deePool = deepool.create(() => 123);
-
-  yaopPool.allocate(100_000_000);
-  deePool.grow(100_000_000);
-
-  test('deePool', () => {
-    for (let i = 0; i < 1000; ++i) {
-      deePool.recycle(deePool.use());
-    }
-  });
+  const deepoolInstance = deepool.create(objectFactory);
+  const objectPoolInstance = new objectPool.ObjectPool(objectFactory);
+  // const objectPoolInstance = objectPool.createObjectPool(objectFactory);
 
   gc();
-  gc();
-
-  test('yaop   ', () => {
+  test('deepool    ', () => {
     for (let i = 0; i < 1000; ++i) {
-      yaopPool.release(yaopPool.take());
+      const obj1 = deepoolInstance.use();
+      const obj2 = deepoolInstance.use();
+      const obj3 = deepoolInstance.use();
+      deepoolInstance.recycle(obj1);
+      deepoolInstance.recycle(obj2);
+      deepoolInstance.recycle(obj3);
     }
-  });
+  }, {targetRme: 0.0002, timeout: 5_000});
+
+  gc();
+  test('object-pool', () => {
+    for (let i = 0; i < 1000; ++i) {
+      const obj1 = objectPoolInstance.take();
+      const obj2 = objectPoolInstance.take();
+      const obj3 = objectPoolInstance.take();
+      objectPoolInstance.release(obj1);
+      objectPoolInstance.release(obj2);
+      objectPoolInstance.release(obj3);
+    }
+  }, {targetRme: 0.0002, timeout: 5_000});
 }
+
+// console.log('\n' + chalk.bold('Pre-allocated pool take/release'));
+// {
+//   const COUNT = 5_000;
+//
+//   const deepoolInstance = deepool.create(objectFactory);
+//   const objectPoolInstance = objectPool.createObjectPool(objectFactory);
+//
+//   objectPoolInstance.allocate(COUNT);
+//
+//   gc();
+//   gc();
+//   test('object-pool', () => {
+//     for (let i = 0; i < 1000; ++i) {
+//       const obj1 = objectPoolInstance.take();
+//       const obj2 = objectPoolInstance.take();
+//       const obj3 = objectPoolInstance.take();
+//       objectPoolInstance.release(obj1);
+//       objectPoolInstance.release(obj2);
+//       objectPoolInstance.release(obj3);
+//     }
+//   }, {targetRme: 0.0002, timeout: 5_000});
+//
+//   deepoolInstance.grow(COUNT);
+//
+//   gc();
+//   gc();
+//   test('deepool    ', () => {
+//     for (let i = 0; i < 1000; ++i) {
+//       const obj1 = deepoolInstance.use();
+//       const obj2 = deepoolInstance.use();
+//       const obj3 = deepoolInstance.use();
+//       deepoolInstance.recycle(obj1);
+//       deepoolInstance.recycle(obj2);
+//       deepoolInstance.recycle(obj3);
+//     }
+//   }, {targetRme: 0.0002, timeout: 5_000});
+// }
 
 console.log('\n' + chalk.bold('Allocation'));
 {
-  let deePool;
-  let yaopPool;
+  let deepoolInstance;
+  let objectPoolInstance;
 
-  test('deePool', () => {
+  gc();
+  test('deepool    ', () => {
     for (let i = 0; i < 1000; ++i) {
-      deePool.use();
+      deepoolInstance.use();
     }
   }, {
-    beforeCycle: () => deePool = deepool.create(() => 123),
+    beforeCycle: () => {
+      deepoolInstance = deepool.create(objectFactory);
+    },
   });
 
   gc();
-  gc();
-
-  test('yaop   ', () => {
+  test('object-pool', () => {
     for (let i = 0; i < 1000; ++i) {
-      yaopPool.take();
+      objectPoolInstance.take();
     }
   }, {
-    beforeCycle: () => yaopPool = createObjectPool(() => 123),
+    beforeCycle: () => {
+      objectPoolInstance = new objectPool.ObjectPool(objectFactory);
+      // objectPoolInstance = objectPool.createObjectPool(objectFactory);
+    },
   });
 }
